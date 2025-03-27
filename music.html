@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        iframe {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>My Spotify Top Tracks</h2>
+        <button class="btn btn-success mb-3" onclick="getTopTracks()">Fetch Top Tracks</button>
+        <ul id="tracks" class="list-group mb-4"></ul>
+        
+        <h3>My Playlist</h3>
+        <iframe id="playlist" title="Spotify Playlist" 
+                src="https://open.spotify.com/embed/playlist/4YL9D57JWzBXteDNYFsp47?utm_source=generator&theme=0"
+                width="100%" height="380" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+        </iframe>
+    </div>
+    
+    <script>
+        const token = 'BQDvJdwh-0QP-dfi0LJs171uozgqtbwtjMnoFuqAStncEsShnpXreRxAKPJFx8Umnguh72aJGumI53M6Vv-HHfX0IhW_41B_ZXBTYo1XRraCtxeWc5GPve5BgrB3uqUXBOVIJQG9te-8XhytPqEBsHKSqkPgoSizIM0OrydU62vdAdONSdXbdHZ1xv92ljRthirWNvM-FrEyy8NpoiLv3lkL5dysK9KdnoupXOf77vWsLC-4FD7etG-7ELaCbOtMtBpb3ZdhfI5azREc4m9q8rFTi64b4z4eM4AmCmEvuQ2QHmtt_iQk0i9M';
+        async function fetchWebApi(endpoint, method, body) {
+            const res = await fetch(`https://api.spotify.com/${endpoint}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method,
+                body: JSON.stringify(body)
+            });
+            return await res.json();
+        }
+
+        async function getTopTracks() {
+            const data = await fetchWebApi('v1/me/top/tracks?time_range=long_term&limit=5', 'GET');
+            const trackList = document.getElementById('tracks');
+            trackList.innerHTML = '';
+            data.items.forEach(track => {
+                let li = document.createElement('li');
+                li.classList.add('list-group-item', 'bg-dark', 'text-white');
+                li.textContent = `${track.name} by ${track.artists.map(artist => artist.name).join(', ')}`;
+                trackList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
